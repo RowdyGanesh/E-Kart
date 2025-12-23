@@ -75,7 +75,7 @@ pipeline {
                     // Decide repository based on version
                     def targetRepo = version.contains('SNAPSHOT')
                             ? SNAPSHOT_REPO
-                            : RELEASE_REPO
+                            : NEXUS_REPO
 
                     echo "Deploying version ${version} to ${targetRepo}"
 
