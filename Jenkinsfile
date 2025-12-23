@@ -84,8 +84,7 @@ pipeline {
                             echo "Deploying version ${version} to ${targetRepo}"
 
                             sh """
-                                mvn deploy -DskipTests
-                                -DaltDeploymentRepository=nexus::default::${NEXUS_URL}/repository/${targetRepo}/
+                                mvn deploy -DskipTests -s ${MAVEN_SETTINGS}
                             """
                         }
                     }
