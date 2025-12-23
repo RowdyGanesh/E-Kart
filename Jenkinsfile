@@ -64,25 +64,30 @@ pipeline {
                 usernameVariable: 'NEXUS_USER',
                 passwordVariable: 'NEXUS_PASS'
             )]) {
-                    script {
+                configFileProvider([configFile(
+                    fileId: 'maven-nexus-settings',
+                    variable: 'MAVEN_SETTINGS'
+                )]) {
+                        script {
 
-                        // Read project version from pom.xml
-                        def version = sh(
-                            script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout",
-                            returnStdout: true
-                        ).trim()
+                            // Read project version from pom.xml
+                            def version = sh(
+                                script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout",
+                                returnStdout: true
+                            ).trim()
 
-                        // Decide repository based on version
-                        def targetRepo = version.contains('SNAPSHOT')
-                            ? SNAPSHOT_REPO
-                            : NEXUS_REPO
+                            // Decide repository based on version
+                            def targetRepo = version.contains('SNAPSHOT')
+                                ? SNAPSHOT_REPO
+                                : NEXUS_REPO
 
-                        echo "Deploying version ${version} to ${targetRepo}"
+                            echo "Deploying version ${version} to ${targetRepo}"
 
-                        sh """
-                            mvn deploy -DskipTests
-                            -DaltDeploymentRepository=nexus::default::${NEXUS_URL}/repository/${targetRepo}/
-                        """
+                            sh """
+                                mvn deploy -DskipTests
+                                -DaltDeploymentRepository=nexus::default::${NEXUS_URL}/repository/${targetRepo}/
+                            """
+                        }
                     }
                 }
             }
