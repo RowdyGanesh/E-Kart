@@ -57,7 +57,6 @@ pipeline {
         // ============================================================
         
         stage('Deploy to Nexus') {
-            steps {
                 steps {    // Securely fetch Nexus credentials stored in Jenkins
                 withCredentials([usernamePassword(
                     credentialsId: 'nexus-creds',
@@ -65,12 +64,13 @@ pipeline {
                     passwordVariable: 'NEXUS_PASS'
                 )]){    // Deploys the Maven artifact to Nexus using Jenkins credentials
                     sh """
-                        mvn deploy -DskipTests \    
+                        mvn deploy -DskipTests  
                         -DaltDeploymentRepository=nexus::default::${NEXUS_URL}/repository/${NEXUS_REPO}/
                     """
                 }
             }
         }
+    }
 
     post {
         success {
