@@ -5,6 +5,11 @@ pipeline {
     tools {
         maven 'Maven3.6'   // Defines Maven 3.6 as the build tool
     }
+
+    environment {
+        NEXUS_URL  = 'http://nexus.rowdyops.click:8081'
+        NEXUS_REPO = 'rowdyops_maven-releases'     // Target Nexus hosted repository for Maven release artifacts
+    }
     
     stages {
 
@@ -47,12 +52,33 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        // ============================================================
+        // Nexus Deployment Stage
+        // ============================================================
+        
+        stage('Deploy to Nexus') {
             steps {
-                echo 'Deploying application...'      
-                // Placeholder stage for deployment logic
+                steps {    // Securely fetch Nexus credentials stored in Jenkins
+                withCredentials([usernamePassword(
+                    credentialsId: 'nexus-creds',
+                    usernameVariable: 'NEXUS_USER',
+                    passwordVariable: 'NEXUS_PASS'
+                )]){    // Deploys the Maven artifact to Nexus using Jenkins credentials
+                    sh """
+                        mvn deploy -DskipTests \    
+                        -DaltDeploymentRepository=nexus::default::${NEXUS_URL}/repository/${NEXUS_REPO}/
+                    """
+                }
             }
         }
 
+    post {
+        success {
+            echo '✅ Build, SonarQube analysis, and Nexus deployment completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed. Check logs for details.'
+        }
+            
     }
 }
