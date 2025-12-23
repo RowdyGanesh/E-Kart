@@ -7,8 +7,9 @@ pipeline {
     }
 
     environment {
-        NEXUS_URL  = 'http://nexus.rowdyops.click:8081'
-        NEXUS_REPO = 'rowdyops_maven-releases'     // Target Nexus hosted repository for Maven release artifacts
+        NEXUS_URL       = 'http://nexus.rowdyops.click:8081'
+        SNAPSHOT_REPO   = 'rowdyops_maven-snapshots'    // Target Nexus hosted repository for Maven release artifacts
+        NEXUS_REPO      = 'rowdyops_maven-releases'     // Target Nexus hosted repository for Maven release artifacts
     }
     
     stages {
@@ -57,15 +58,30 @@ pipeline {
         // ============================================================
         
         stage('Deploy to Nexus') {
-                steps {    // Securely fetch Nexus credentials stored in Jenkins
+            steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'nexus-creds',
-                    usernameVariable: 'NEXUS_USER',
-                    passwordVariable: 'NEXUS_PASS'
-                )]){    // Deploys the Maven artifact to Nexus using Jenkins credentials
+                credentialsId: 'nexus-creds',
+                usernameVariable: 'NEXUS_USER',
+                passwordVariable: 'NEXUS_PASS'
+            )]) {
+                script {
+
+                    // Read project version from pom.xml
+                    def version = sh(
+                        script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout",
+                        returnStdout: true
+                    ).trim()
+
+                    // Decide repository based on version
+                    def targetRepo = version.contains('SNAPSHOT')
+                            ? SNAPSHOT_REPO
+                            : RELEASE_REPO
+
+                    echo "Deploying version ${version} to ${targetRepo}"
+
                     sh """
-                        mvn deploy -DskipTests  
-                        -DaltDeploymentRepository=nexus::default::${NEXUS_URL}/repository/${NEXUS_REPO}/
+                        mvn deploy -DskipTests
+                        -DaltDeploymentRepository=nexus::default::${NEXUS_URL}/repository/${targetRepo}/
                     """
                 }
             }
