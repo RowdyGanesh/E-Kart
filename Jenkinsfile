@@ -32,12 +32,8 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {      
-                    sh '''
-                        mvn sonar:sonar \
-                        -Dsonar.projectKey=E-Kart \
-                        -Dsonar.projectName="E-Kart Application"
-                    '''
-                    // Performs static code analysis and publishes results to SonarQube
+                    sh 'mvn sonar:sonar'
+                    // Uses sonar-project.properties from repo
                 }
             }
         }
