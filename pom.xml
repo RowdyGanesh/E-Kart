@@ -159,14 +159,14 @@
 
          <distributionManagement>
     <repository>
-      <id>maven-releases</id>
-      <name>maven-releases</name>
-      <url>http://3.108.254.192:8081/repository/maven-releases/</url>
+      <id>rowdyops_maven-releases</id>
+      <name>rowdyops_maven-releases</name>
+      <url>http://nexus.rowdyops.click:8081/repository/rowdyops_maven-releases/</url>
     </repository>
     <snapshotRepository>
-      <id>maven-snapshots</id>
-      <name>maven-snapshots</name>
-      <url>http://3.108.254.192:8081/repository/maven-snapshots/</url>
+      <id>rowdyops_maven-snapshots</id>
+      <name>rowdyops_maven-snapshots</name>
+      <url>http://nexus.rowdyops.click:8081/repository/rowdyops_maven-snapshots</url>
     </snapshotRepository>
 </distributionManagement>
 
