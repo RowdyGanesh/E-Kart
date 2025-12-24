@@ -1,11 +1,14 @@
-FROM openjdk:8u151-jdk-alpine3.7
+# -------- Stage 1: Build --------
+FROM maven:3.8.6-openjdk-8 AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-EXPOSE 8070
-
-ENV APP_HOME /usr/src/app
-
-COPY target/shopping-cart-0.0.1-SNAPSHOT.jar $APP_HOME/app.jar
-
-WORKDIR $APP_HOME
-
-ENTRYPOINT exec java -jar app.jar
+# -------- Stage 2: Runtime --------
+FROM openjdk:8-jre-slim
+WORKDIR /app
+COPY --from=build /app/target/shopping-cart-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 9090
+ENTRYPOINT ["java","-jar","app.jar"]
