@@ -1,5 +1,5 @@
 # Use lightweight Java runtime image
-FROM openjdk:8-jre-slim
+FROM eclipse-temurin:8-jre
 
 # Set working directory inside container
 WORKDIR /app
