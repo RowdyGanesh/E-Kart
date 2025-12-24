@@ -52,12 +52,8 @@ pipeline {
                 }
             }
         }
-
-        // ============================================================
-        // Nexus Deployment Stage
-        // ============================================================
         
-        stage('Deploy to Nexus') {
+        stage('Publish Artifact to Nexus') {
             steps {
                 withCredentials([usernamePassword(
                 credentialsId: 'nexus-creds',
@@ -91,21 +87,21 @@ pipeline {
                 }
             }
         }
-    }
 
-    stage('Docker Build') {
-        steps {
-            script {
-                def imageName = "${env.ORG_NAME}-${env.SERVICE_NAME}"
-                def imageTag  = "${BUILD_NUMBER}"
+        stage('Docker Build') {
+            steps {
+                script {
+                    def imageName = "${env.ORG_NAME}-${env.SERVICE_NAME}"
+                    def imageTag  = "${BUILD_NUMBER}"
 
-                echo "Building Docker image ${imageName}:${imageTag}"
+                    echo "Building Docker image ${imageName}:${imageTag}"
 
-                sh """
-                    docker build \
-                    -t ${imageName}:${imageTag} \
-                    -f docker/Dockerfile .
-                """
+                    sh """
+                        docker build \
+                        -t ${imageName}:${imageTag} \
+                        -f docker/Dockerfile .
+                    """
+                }
             }
         }
     }
