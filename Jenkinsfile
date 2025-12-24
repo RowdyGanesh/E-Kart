@@ -8,6 +8,8 @@ pipeline {
 
     environment {
 
+        ORG_NAME        = "rowdyops"
+        SERVICE_NAME    = "ecart-service"
         NEXUS_URL       = 'http://nexus.rowdyops.click:8081'    // Base URL of Nexus Repository Manager
         SNAPSHOT_REPO   = 'rowdyops_maven-snapshots'            // Target Nexus hosted repository for SNAPSHOT artifacts
         NEXUS_REPO      = 'rowdyops_maven-releases'             // Target Nexus hosted repository for RELEASE artifacts
