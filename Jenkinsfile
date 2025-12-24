@@ -10,40 +10,28 @@ pipeline {
 
     environment {
 
-        NEXUS_URL       = 'http://nexus.rowdyops.click:8081'
-        // Base URL of Nexus Repository Manager
+        NEXUS_URL       = 'http://nexus.rowdyops.click:8081'    // Base URL of Nexus Repository Manager
+        SNAPSHOT_REPO   = 'rowdyops_maven-snapshots'            // Target Nexus hosted repository for SNAPSHOT artifacts
+        NEXUS_REPO      = 'rowdyops_maven-releases'             // Target Nexus hosted repository for RELEASE artifacts
+        APP_NAME        = 'shopping-cart'                       // Logical application name used for logging and traceability
+        BUILD_ENV       = 'dev'                                 // Environment identifier (dev / tst / uat / prod)
+                                                                // Currently informational only – does not affect build logic
 
-        SNAPSHOT_REPO   = 'rowdyops_maven-snapshots'
-        // Target Nexus hosted repository for SNAPSHOT artifacts
-
-        NEXUS_REPO      = 'rowdyops_maven-releases'
-        // Target Nexus hosted repository for RELEASE artifacts
-
-        APP_NAME        = 'shopping-cart'
-        // Logical application name used for logging and traceability
-
-        BUILD_ENV       = 'dev'
-        // Environment identifier (dev / tst / uat / prod)
-        // Currently informational only – does not affect build logic
-
-        MAVEN_OPTS      = '-Xmx1024m'
-        // JVM memory options for Maven execution
+        MAVEN_OPTS      = '-Xmx1024m'                           // JVM memory options for Maven execution
     }
     
     stages {
 
         stage('Checkout') {
             steps {
-                checkout scm   
-                // Pulls source code from the configured Git repository
+                checkout scm                         // Pulls source code from the configured Git repository
             }
         }
 
         
         stage('Build') {
             steps {
-                sh 'mvn clean install -DskipTests'   
-                // Builds and packages the application while skipping tests
+                sh 'mvn clean install -DskipTests'   // Builds and packages the application while skipping tests
             }
         }
 
@@ -51,8 +39,7 @@ pipeline {
         stage('UnitTest') {
             steps {
                 echo 'Skipping unit tests...'        
-                sh 'mvn test -DskipTests'            
-                // Unit tests are skipped for faster pipeline execution
+                sh 'mvn test -DskipTests'            // Unit tests are skipped for faster pipeline execution
             }
         }
 
@@ -60,9 +47,8 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {      
-                    sh 'mvn sonar:sonar'
-                    // Runs SonarQube analysis
-                    // Uses sonar-project.properties from repository
+                    sh 'mvn sonar:sonar'            // Runs SonarQube analysis
+                                                    // Uses sonar-project.properties from repository
                 }
             }
         }
@@ -71,8 +57,7 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'MINUTES') {  
-                    waitForQualityGate abortPipeline: true
-                    // Fails the pipeline if SonarQube Quality Gate fails
+                    waitForQualityGate abortPipeline: true    // Fails the pipeline if SonarQube Quality Gate fails
                 }
             }
         }
