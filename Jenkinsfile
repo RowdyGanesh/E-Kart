@@ -1,11 +1,9 @@
 pipeline {
 
-    agent any   
-    // Allows the pipeline to run on any available Jenkins agent
+    agent any                          // Allows the pipeline to run on any available Jenkins agent
 
     tools {
-        maven 'Maven3.6'   
-        // Defines Maven 3.6 as the build tool configured in Jenkins
+        maven 'Maven3.6'               // Defines Maven 3.6 as the build tool configured in Jenkins
     }
 
     environment {
@@ -63,7 +61,7 @@ pipeline {
         }
 
         
-        stage('Deploy to Nexus') {
+        stage('Publish Artifact to Nexus') {
             steps {
 
                 withCredentials([usernamePassword(
