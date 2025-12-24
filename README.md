@@ -16,7 +16,7 @@ Checkout is transactional.
 
 ### Configuration Files
 
-Folder **src/resources/** contains config files for **shopping-cart** Spring Boot application.
+Folder **src/resources/** contains config files for **ecart-service** Spring Boot application.
 
 * **src/resources/application.properties** - main configuration file. Here it is possible to change admin username/password,
 as well as change the port number.
@@ -54,7 +54,7 @@ $ scripts/mvnw clean package
 
 Then you can run the JAR file:
 ```bash
-$ java -jar target/shopping-cart-0.0.1-SNAPSHOT.jar
+$ java -jar target/ecart-service-0.0.1-SNAPSHOT.jar
 ```
 
 ### Maven
@@ -96,26 +96,26 @@ $ mvn clean package
 To run that application, use the java -jar command, as follows:
 
 ```bash
-$ java -jar target/shopping-cart-0.0.1-SNAPSHOT.jar
+$ java -jar target/ecart-service-0.0.1-SNAPSHOT.jar
 ```
 
 To exit the application, press **ctrl-c**.
 
 ### Docker
 
-It is possible to run **shopping-cart** using Docker:
+It is possible to run **ecart-service** using Docker:
 
 Build Docker image:
 ```bash
 $ mvn clean package
-$ docker build -t shopping-cart:dev -f docker/Dockerfile .
+$ docker build -t ecart-service:dev -f docker/Dockerfile .
 ```
 
 Run Docker container:
 ```bash
 $ docker run --rm -i -p 8070:8070 \
-      --name shopping-cart \
-      shopping-cart:dev
+      --name ecart-service \
+      ecart-service:dev
 ```
 
 ##### Helper script
@@ -131,12 +131,12 @@ $ scripts/run_docker.sh
 
 Folder **docker** contains:
 
-* **docker/shopping-cart/Dockerfile** - Docker build file for executing shopping-cart Docker image. 
+* **docker/ecart-service/Dockerfile** - Docker build file for executing ecart-service Docker image. 
 Instructions to build artifacts, copy build artifacts to docker image and then run app on proper port with proper configuration file.
 
 ## Util Scripts
 
-* **scripts/run_docker.sh.sh** - util script for running shopping-cart Docker container using **docker/Dockerfile**
+* **scripts/run_docker.sh.sh** - util script for running ecart-service Docker container using **docker/Dockerfile**
 
 ## Tests
 

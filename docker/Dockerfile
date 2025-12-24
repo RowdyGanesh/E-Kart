@@ -5,7 +5,7 @@ FROM eclipse-temurin:8-jre
 WORKDIR /app
 
 # Copy Spring Boot jar into container
-COPY target/shopping-cart-0.0.1-SNAPSHOT.jar app.jar
+COPY target/ecart-service-0.0.1-SNAPSHOT.jar app.jar
 
 # Application runs on port 8080
 EXPOSE 9090

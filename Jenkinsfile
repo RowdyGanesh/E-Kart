@@ -10,7 +10,7 @@ pipeline {
                 NEXUS_URL       = 'http://nexus.rowdyops.click:8081'    // Base URL of Nexus Repository Manager
                 SNAPSHOT_REPO   = 'rowdyops_maven-snapshots'            // Target Nexus hosted repository for SNAPSHOT artifacts
                 NEXUS_REPO      = 'rowdyops_maven-releases'             // Target Nexus hosted repository for RELEASE artifacts
-                APP_NAME        = 'shopping-cart'                       // Logical application name used for logging and traceability
+                APP_NAME        = 'ecart-service'                       // Logical application name used for logging and traceability
                 BUILD_ENV       = 'dev'                                 // Environment identifier (dev / tst / uat / prod)
 
                 MAVEN_OPTS      = '-Xmx1024m'                           // JVM memory options for Maven execution

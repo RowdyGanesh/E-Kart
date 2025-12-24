@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONTAINER_NAME=spring-boot-shopping-cart
+CONTAINER_NAME=spring-boot-ecart-service
 echo -e "\nSet docker container name as ${CONTAINER_NAME}\n"
 IMAGE_NAME=${CONTAINER_NAME}:dev
 echo -e "\nSet docker image name as ${IMAGE_NAME}\n"
