@@ -143,6 +143,19 @@ pipeline {
             }
         }
 
+        stage('Cleanup Docker Images') {
+            steps {
+                script {
+                    def imageName = "${env.ORG_NAME}-${env.SERVICE_NAME}"
+                    echo "Cleaning Docker images for ${imageName}"
+
+                    sh """
+                        docker rmi -f ${imageName}:${BUILD_NUMBER} || true
+                    """
+                }
+            }
+        }
+
     }
 
     post {
