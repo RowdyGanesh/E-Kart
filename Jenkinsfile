@@ -120,6 +120,29 @@ pipeline {
                 }
             }
         }
+
+        stage('Push Docker Image to ECR') {
+            steps {
+                script {
+                    echo "Logging in to ECR..."
+                    sh """
+                        aws ecr get-login-password --region ${AWS_REGION} \
+                        | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                    """
+
+                    echo "Tagging image for ECR push..."
+                    sh """
+                        docker tag ${ORG_NAME}-${SERVICE_NAME}:${BUILD_NUMBER} ${ECR_REGISTRY}/${ECR_REPO}:${BUILD_NUMBER}
+                    """
+
+                    echo "Pushing image to ECR..."
+                    sh """
+                        docker push ${ECR_REGISTRY}/${ECR_REPO}:${BUILD_NUMBER}
+                    """
+                }
+            }
+        }
+
     }
 
     post {
