@@ -22,8 +22,10 @@ pipeline {
                 SERVICE_NAME    = 'ecart-service'
 
                 // AWS / ECR
-                AWS_REGION = 'ap-south-1'
-                ECR_REPO   = '910478837823.dkr.ecr.ap-south-1.amazonaws.com/rowdyops-ecart-service'
+                AWS_REGION      = 'ap-south-1'
+                AWS_ACCOUNT_ID  = '910478837823'
+                ECR_REPO        = 'rowdyops-ecart-service'
+                ECR_REGISTRY    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
     }
     
     stages {
