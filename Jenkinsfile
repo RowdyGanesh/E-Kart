@@ -156,6 +156,24 @@ pipeline {
             }
         }
 
+        stage('Update Task Definition') {
+            steps {
+                script {
+                    sh """
+                    aws ecs describe-task-definition \
+                        --task-definition rowdyops-ecart-service-td \
+                        --query taskDefinition > td.json
+
+                    sed -i 's|rowdyops-ecart-service:latest|rowdyops-ecart-service:${BUILD_NUMBER}|g' td.json
+
+                    aws ecs register-task-definition \
+                        --family rowdyops-ecart-service-td \
+                        --cli-input-json file://td.json
+                    """
+                }
+            }
+        }
+
         stage('Deploy to ECS') {
             steps {
                 script {
