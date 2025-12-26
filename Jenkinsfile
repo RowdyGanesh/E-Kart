@@ -156,6 +156,22 @@ pipeline {
             }
         }
 
+        stage('Deploy to ECS') {
+            steps {
+                script {
+                    echo "🔄 Updating ECS service with latest image tag ${BUILD_NUMBER}"
+
+                    sh """
+                        aws ecs update-service \
+                        --cluster rowdyops-dev-cluster \
+                        --service ecart-service \
+                        --force-new-deployment \
+                        --region ${AWS_REGION}
+                    """
+                }
+            }
+        }
+
     }
 
     post {
