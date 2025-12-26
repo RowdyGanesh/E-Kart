@@ -176,11 +176,12 @@ pipeline {
                             .compatibilities,
                             .registeredAt,
                             .registeredBy
-                            )' > td_clean.json
+                        )' > td_clean.json
 
-                        # update only the image
-                        sed -i "s|rowdyops-ecart-service:latest|rowdyops-ecart-service:${BUILD_NUMBER}|g" td_clean.json
+                        # update image tag dynamically (works for any previous number)
+                        sed -i "s|${ECR_REGISTRY}/${ECR_REPO}:[0-9]*|${ECR_REGISTRY}/${ECR_REPO}:${BUILD_NUMBER}|g" td_clean.json
 
+                        # register new revision
                         aws ecs register-task-definition \
                         --cli-input-json file://td_clean.json
                     """
