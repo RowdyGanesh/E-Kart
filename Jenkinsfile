@@ -26,6 +26,11 @@ pipeline {
                 AWS_ACCOUNT_ID  = '910478837823'
                 ECR_REPO        = 'rowdyops-ecart-service'
                 ECR_REGISTRY    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+                // AWS / ECS
+                CLUSTER_NAME     = 'rowdyops-dev-cluster'
+                ECS_SERVICE_NAME = 'rowdyops-ecart-service'
+                TASK_FAMILY      = "${ORG_NAME}-${SERVICE_NAME}-td"
     }
     
     stages {
@@ -186,15 +191,20 @@ pipeline {
         stage('Deploy to ECS') {
             steps {
                 script {
-                    def newRevision = sh(script: "aws ecs describe-task-definition --task-definition ${SERVICE_NAME}-td --query 'taskDefinition.revision' --output text", returnStdout: true).trim()
+                    echo "📌 Fetching latest revision for task family: ${TASK_FAMILY}"
 
-                    echo "🚀 Updating ECS service to revision ${newRevision}"
+                    def newRevision = sh(
+                        script: "aws ecs describe-task-definition --task-definition ${TASK_FAMILY} --query 'taskDefinition.revision' --output text",
+                        returnStdout: true
+                    ).trim()
+
+                    echo "🚀 Updating ECS service ${ECS_SERVICE_NAME} to revision ${newRevision}"
 
                     sh """
                         aws ecs update-service \
                         --cluster ${CLUSTER_NAME} \
                         --service ${ECS_SERVICE_NAME} \
-                        --task-definition ${SERVICE_NAME}-td:${newRevision} \
+                        --task-definition ${TASK_FAMILY}:${newRevision} \
                         --force-new-deployment \
                         --region ${AWS_REGION}
                     """
