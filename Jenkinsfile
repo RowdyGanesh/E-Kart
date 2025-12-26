@@ -22,8 +22,10 @@ pipeline {
                 SERVICE_NAME    = 'ecart-service'
 
                 // AWS / ECR
-                AWS_REGION = 'ap-south-1'
-                ECR_REPO   = '910478837823.dkr.ecr.ap-south-1.amazonaws.com/rowdyops-ecart-service'
+                AWS_REGION      = 'ap-south-1'
+                AWS_ACCOUNT_ID  = '910478837823'
+                ECR_REPO        = 'rowdyops-ecart-service'
+                ECR_REGISTRY    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
     }
     
     stages {
@@ -118,6 +120,42 @@ pipeline {
                 }
             }
         }
+
+        stage('Push Docker Image to ECR') {
+            steps {
+                script {
+                    echo "Logging in to ECR..."
+                    sh """
+                        aws ecr get-login-password --region ${AWS_REGION} \
+                        | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                    """
+
+                    echo "Tagging image for ECR push..."
+                    sh """
+                        docker tag ${ORG_NAME}-${SERVICE_NAME}:${BUILD_NUMBER} ${ECR_REGISTRY}/${ECR_REPO}:${BUILD_NUMBER}
+                    """
+
+                    echo "Pushing image to ECR..."
+                    sh """
+                        docker push ${ECR_REGISTRY}/${ECR_REPO}:${BUILD_NUMBER}
+                    """
+                }
+            }
+        }
+
+        stage('Cleanup Docker Images') {
+            steps {
+                script {
+                    def imageName = "${env.ORG_NAME}-${env.SERVICE_NAME}"
+                    echo "Cleaning Docker images for ${imageName}"
+
+                    sh """
+                        docker rmi -f ${imageName}:${BUILD_NUMBER} || true
+                    """
+                }
+            }
+        }
+
     }
 
     post {
