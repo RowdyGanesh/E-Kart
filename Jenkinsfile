@@ -164,7 +164,7 @@ pipeline {
                     sh """
                         aws ecs update-service \
                         --cluster rowdyops-dev-cluster \
-                        --service ecart-service \
+                        --service rowdyops-ecart-service \
                         --force-new-deployment \
                         --region ${AWS_REGION}
                     """
