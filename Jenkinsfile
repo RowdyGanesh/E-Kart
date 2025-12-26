@@ -160,15 +160,24 @@ pipeline {
             steps {
                 script {
                     sh """
-                    aws ecs describe-task-definition \
+                        aws ecs describe-task-definition \
                         --task-definition rowdyops-ecart-service-td \
-                        --query taskDefinition > td.json
+                        --query taskDefinition \
+                        | jq 'del(
+                            .taskDefinitionArn,
+                            .revision,
+                            .status,
+                            .requiresAttributes,
+                            .compatibilities,
+                            .registeredAt,
+                            .registeredBy
+                            )' > td_clean.json
 
-                    sed -i 's|rowdyops-ecart-service:latest|rowdyops-ecart-service:${BUILD_NUMBER}|g' td.json
+                        # update only the image
+                        sed -i "s|rowdyops-ecart-service:latest|rowdyops-ecart-service:${BUILD_NUMBER}|g" td_clean.json
 
-                    aws ecs register-task-definition \
-                        --family rowdyops-ecart-service-td \
-                        --cli-input-json file://td.json
+                        aws ecs register-task-definition \
+                        --cli-input-json file://td_clean.json
                     """
                 }
             }
