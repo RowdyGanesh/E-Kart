@@ -26,6 +26,11 @@ pipeline {
                 AWS_ACCOUNT_ID  = '910478837823'
                 ECR_REPO        = 'rowdyops-ecart-service'
                 ECR_REGISTRY    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+                // AWS / ECS
+                CLUSTER_NAME     = 'rowdyops-dev-cluster'
+                ECS_SERVICE_NAME = 'rowdyops-ecart-service'
+                TASK_FAMILY      = "${ORG_NAME}-${SERVICE_NAME}-td"
     }
     
     stages {
@@ -151,6 +156,58 @@ pipeline {
 
                     sh """
                         docker rmi -f ${imageName}:${BUILD_NUMBER} || true
+                    """
+                }
+            }
+        }
+
+        stage('Update Task Definition') {
+            steps {
+                script {
+                    sh """
+                        aws ecs describe-task-definition \
+                        --task-definition rowdyops-ecart-service-td \
+                        --query taskDefinition \
+                        | jq 'del(
+                            .taskDefinitionArn,
+                            .revision,
+                            .status,
+                            .requiresAttributes,
+                            .compatibilities,
+                            .registeredAt,
+                            .registeredBy
+                        )' > td_clean.json
+
+                        # update image tag dynamically (works for any previous number)
+                        sed -i "s|${ECR_REGISTRY}/${ECR_REPO}:[0-9]*|${ECR_REGISTRY}/${ECR_REPO}:${BUILD_NUMBER}|g" td_clean.json
+
+                        # register new revision
+                        aws ecs register-task-definition \
+                        --cli-input-json file://td_clean.json
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to ECS') {
+            steps {
+                script {
+                    echo "📌 Fetching latest revision for task family: ${TASK_FAMILY}"
+
+                    def newRevision = sh(
+                        script: "aws ecs describe-task-definition --task-definition ${TASK_FAMILY} --query 'taskDefinition.revision' --output text",
+                        returnStdout: true
+                    ).trim()
+
+                    echo "🚀 Updating ECS service ${ECS_SERVICE_NAME} to revision ${newRevision}"
+
+                    sh """
+                        aws ecs update-service \
+                        --cluster ${CLUSTER_NAME} \
+                        --service ${ECS_SERVICE_NAME} \
+                        --task-definition ${TASK_FAMILY}:${newRevision} \
+                        --force-new-deployment \
+                        --region ${AWS_REGION}
                     """
                 }
             }
