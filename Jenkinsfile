@@ -186,12 +186,15 @@ pipeline {
         stage('Deploy to ECS') {
             steps {
                 script {
-                    echo "🔄 Updating ECS service with latest image tag ${BUILD_NUMBER}"
+                    def newRevision = sh(script: "aws ecs describe-task-definition --task-definition ${SERVICE_NAME}-td --query 'taskDefinition.revision' --output text", returnStdout: true).trim()
+
+                    echo "🚀 Updating ECS service to revision ${newRevision}"
 
                     sh """
                         aws ecs update-service \
-                        --cluster rowdyops-dev-cluster \
-                        --service rowdyops-ecart-service \
+                        --cluster ${CLUSTER_NAME} \
+                        --service ${ECS_SERVICE_NAME} \
+                        --task-definition ${SERVICE_NAME}-td:${newRevision} \
                         --force-new-deployment \
                         --region ${AWS_REGION}
                     """
