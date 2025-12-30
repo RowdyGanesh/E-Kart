@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.reljicd</groupId>
-    <artifactId>shopping-cart</artifactId>
+    <artifactId>ecart-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>shopping-cart</name>
+    <name>ecart-service</name>
     <description>Demo project for Spring Boot Shopping Cart</description>
 
     <parent>
@@ -23,10 +23,12 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <jacoco.version>0.8.11</jacoco.version>
-    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-    <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
-    <sonar.language>java</sonar.language>
+        <!-- Custom readable build timestamp -->
+        <maven.build.timestamp.format>dd-MM-yyyy HH:mm:ss</maven.build.timestamp.format> 
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+        <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.language>java</sonar.language>
     </properties>
 
     <dependencies>
@@ -120,44 +122,68 @@
 
     <build>
         <plugins>
+            <!-- Spring Boot Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-                 <plugin>
-    <groupId>org.jacoco</groupId>
-    <artifactId>jacoco-maven-plugin</artifactId>
-    <version>${jacoco.version}</version>
-    <executions>
-        <execution>
-            <id>jacoco-initialize</id>
-            <goals>
-                <goal>prepare-agent</goal>
-            </goals>
-        </execution>
-        <execution>
-            <id>jacoco-site</id>
-            <phase>package</phase>
-            <goals>
-                <goal>report</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
+           <!-- Embed build date and version into JAR manifest -->
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-jar-plugin</artifactId>
+               <version>3.3.0</version>
+               <configuration>
+                   <archive>
+                       <manifestEntries>
+                           <Build-Date>${maven.build.timestamp}</Build-Date>
+                           <Build-Version>${project.version}</Build-Version>
+                       </manifestEntries>
+                   </archive>
+               </configuration>
+           </plugin>
+
+           <!-- SonarQube Maven Plugin -->
+           <plugin>
+               <groupId>org.sonarsource.scanner.maven</groupId>
+               <artifactId>sonar-maven-plugin</artifactId>
+               <version>3.11.0.3922</version>
+           </plugin>
+
+           <!-- JaCoCo Plugin -->
+           <plugin>
+                  <groupId>org.jacoco</groupId>
+                  <artifactId>jacoco-maven-plugin</artifactId>
+                  <version>${jacoco.version}</version>
+                      <executions>
+                          <execution>
+                              <id>jacoco-initialize</id>
+                                   <goals>
+                                            <goal>prepare-agent</goal>
+                                    </goals>
+                          </execution>
+                     <execution>
+                  <id>jacoco-site</id>
+                  <phase>package</phase>
+                     <goals>
+                         <goal>report</goal>
+                     </goals>
+                 </execution>
+             </executions>
+         </plugin>
         </plugins>
     </build>
 
          <distributionManagement>
     <repository>
-      <id>maven-releases</id>
-      <name>maven-releases</name>
-      <url>http://3.108.254.192:8081/repository/maven-releases/</url>
+      <id>rowdyops_maven-releases</id>
+      <name>rowdyops_maven-releases</name>
+      <url>http://nexus.rowdyops.click:8081/repository/rowdyops_maven-releases/</url>
     </repository>
     <snapshotRepository>
-      <id>maven-snapshots</id>
-      <name>maven-snapshots</name>
-      <url>http://3.108.254.192:8081/repository/maven-snapshots/</url>
+      <id>rowdyops_maven-snapshots</id>
+      <name>rowdyops_maven-snapshots</name>
+      <url>http://nexus.rowdyops.click:8081/repository/rowdyops_maven-snapshots</url>
     </snapshotRepository>
 </distributionManagement>
 

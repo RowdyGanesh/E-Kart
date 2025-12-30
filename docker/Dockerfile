@@ -1,11 +1,17 @@
-FROM openjdk:8u151-jdk-alpine3.7
+# Use lightweight Java runtime image
+FROM eclipse-temurin:8-jre
 
-EXPOSE 8070
+# Set working directory inside container
+WORKDIR /app
 
-ENV APP_HOME /usr/src/app
+# Copy Spring Boot jar into container
+COPY target/ecart-service-0.0.1-SNAPSHOT.jar app.jar
 
-COPY target/shopping-cart-0.0.1-SNAPSHOT.jar $APP_HOME/app.jar
+# Make Spring Boot listen on 9090
+ENV SERVER_PORT=9090
 
-WORKDIR $APP_HOME
+# Expose the correct port
+EXPOSE 9090
 
-ENTRYPOINT exec java -jar app.jar
+# Start the application with correct port + health enabled
+ENTRYPOINT ["java","-jar","app.jar","--server.port=9090","--management.endpoints.web.exposure.include=*","--management.server.port=9090"]
