@@ -41,24 +41,18 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         this.dataSource = dataSource;
     }
 
-    @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         http.csrf().disable()
                 .authorizeRequests()
-
-                // Allow AWS ALB health checks
-                .antMatchers("/actuator/health", "/actuator/health/**").permitAll()
-
-                // existing routes
                 .antMatchers(
-                    "/home",
-                    "/registration",
-                    "/error",
-                    "/h2-console/**",
-                    "/actuator/health",
-                    "/actuator/health/liveness",
-                    "/actuator/health/readiness"
+                        "/",                      // optional
+                        "/home",
+                        "/registration",
+                        "/error",
+                        "/h2-console/**",
+                        "/actuator/health/**",    // <--- REQUIRED for ECS/ALB health
+                        "/actuator/**"            // <--- optional but recommended during POC
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -71,22 +65,21 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .and()
                 .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
-                // Fix for H2 console
-                .and().headers().frameOptions().disable();
+                .and()
+                .headers().frameOptions().disable();  // allow H2 console
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
-        // Database authentication
-        auth.
-                jdbcAuthentication()
+        // DB authentication
+        auth.jdbcAuthentication()
                 .usersByUsernameQuery(usersQuery)
                 .authoritiesByUsernameQuery(rolesQuery)
                 .dataSource(dataSource)
                 .passwordEncoder(passwordEncoder());
 
-        // In memory authentication
+        // In-memory admin
         auth.inMemoryAuthentication()
                 .withUser(adminUsername).password(adminPassword).roles("ADMIN");
     }
@@ -95,5 +88,4 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
