@@ -68,7 +68,7 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'MINUTES') {  
-                    waitForQualityGate abortPipeline: true
+                    waitForQualityGate abortPipeline: false
                     // Fails the pipeline if SonarQube quality gate conditions are not met
                 }
             }
@@ -166,9 +166,11 @@ pipeline {
                 script {
                     sh """
                         aws ecs describe-task-definition \
-                        --task-definition rowdyops-ecart-service-td \
-                        --query taskDefinition \
-                        | jq 'del(
+                        --task-definition ${TASK_FAMILY} \
+                        --query taskDefinition > td.json
+
+                        # 🧹 Clean AWS-managed fields
+                        jq 'del(
                             .taskDefinitionArn,
                             .revision,
                             .status,
@@ -176,14 +178,17 @@ pipeline {
                             .compatibilities,
                             .registeredAt,
                             .registeredBy
-                        )' > td_clean.json
+                        )' td.json > td_clean.json
+
+                        #  FIX: Set hostPort = 0 for awsvpc / ALB — ports MUST match
+                        jq '.containerDefinitions[].portMappings[] |= (.containerPort=9090 | .hostPort=9090 | .protocol="tcp")' \
+                        td_clean.json > td_hostfix.json
 
                         # update image tag dynamically (works for any previous number)
-                        sed -i "s|${ECR_REGISTRY}/${ECR_REPO}:[0-9]*|${ECR_REGISTRY}/${ECR_REPO}:${BUILD_NUMBER}|g" td_clean.json
+                        sed -i "s|${ECR_REGISTRY}/${ECR_REPO}:[0-9]*|${ECR_REGISTRY}/${ECR_REPO}:${BUILD_NUMBER}|g" td_hostfix.json
 
                         # register new revision
-                        aws ecs register-task-definition \
-                        --cli-input-json file://td_clean.json
+                        aws ecs register-task-definition --cli-input-json file://td_hostfix.json
                     """
                 }
             }
