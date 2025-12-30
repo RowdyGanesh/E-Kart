@@ -51,7 +51,15 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/actuator/health", "/actuator/health/**").permitAll()
 
                 // existing routes
-                .antMatchers("/home", "/registration", "/error", "/h2-console/**").permitAll()
+                .antMatchers(
+                    "/home",
+                    "/registration",
+                    "/error",
+                    "/h2-console/**",
+                    "/actuator/health",
+                    "/actuator/health/liveness",
+                    "/actuator/health/readiness"
+                ).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
