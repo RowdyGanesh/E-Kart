@@ -180,8 +180,8 @@ pipeline {
                             .registeredBy
                         )' td.json > td_clean.json
 
-                        #  FIX: Set hostPort = 0 for awsvpc / ALB
-                        jq '.containerDefinitions[].portMappings[].hostPort = 0' \
+                        #  FIX: Set hostPort = 0 for awsvpc / ALB — ports MUST match
+                        jq '.containerDefinitions[].portMappings[] |= (.containerPort=9090 | .hostPort=9090 | .protocol="tcp")' \
                         td_clean.json > td_hostfix.json
 
                         # update image tag dynamically (works for any previous number)
