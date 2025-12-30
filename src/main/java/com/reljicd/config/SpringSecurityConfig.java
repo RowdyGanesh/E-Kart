@@ -51,8 +51,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/registration",
                         "/error",
                         "/h2-console/**",
-                        "/actuator/health/**",    // <--- REQUIRED for ECS/ALB health
-                        "/actuator/**"            // <--- optional but recommended during POC
+                        "/actuator/health",    // <--- REQUIRED for ECS/ALB health
+                        "/actuator/health/**"  // <--- optional but recommended during POC
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()
