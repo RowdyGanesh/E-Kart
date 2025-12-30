@@ -15,10 +15,6 @@ import javax.sql.DataSource;
 
 /**
  * Spring Security Configuration
- * http://docs.spring.io/spring-boot/docs/current/reference/html/howto-security.html
- * Switches off Spring Boot automatic security configuration
- *
- * @author Dusan
  */
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -45,19 +41,16 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         this.dataSource = dataSource;
     }
 
-    /**
-     * HTTPSecurity configurer
-     * - roles ADMIN allow to access /admin/**
-     * - roles USER allow to access /user/** and /newPost/**
-     * - anybody can visit /, /home, /about, /registration, /error, /blog/**, /post/**, /h2-console/**
-     * - every other page needs authentication
-     * - custom 403 access denied handler
-     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         http.csrf().disable()
                 .authorizeRequests()
+
+                // Allow AWS ALB health checks
+                .antMatchers("/actuator/health", "/actuator/health/**").permitAll()
+
+                // existing routes
                 .antMatchers("/home", "/registration", "/error", "/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
@@ -74,10 +67,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().headers().frameOptions().disable();
     }
 
-
-    /**
-     * Authentication details
-     */
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
@@ -94,9 +83,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .withUser(adminUsername).password(adminPassword).roles("ADMIN");
     }
 
-    /**
-     * Configure and return BCrypt password encoder
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
