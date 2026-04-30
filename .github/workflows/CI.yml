@@ -1,4 +1,4 @@
-# CI Pipeline: Build Java App + Create Docker Image
+# CI Pipeline: Build Java App + Build & Push Docker Image
 name: Java CI with Maven
 
 # Trigger workflow on push & PR to GH-Actions branch
@@ -32,4 +32,16 @@ jobs:
 
     # Build Docker Image
     - name: Build Docker Image
-      run: docker build -t ecart-service:${{ github.sha }} .
+      run: |
+        docker build -t rowdygani/ecart-service:latest .
+        docker build -t rowdygani/ecart-service:${{ github.sha }} .
+
+    # 🔐 Login to Docker Hub
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    # 📤 Push Docker Images
+    - name: Push Docker Image
+      run: |
+        docker push rowdygani/ecart-service:latest
+        docker push rowdygani/ecart-service:${{ github.sha }}
