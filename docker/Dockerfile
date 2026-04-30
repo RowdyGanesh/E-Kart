@@ -1,17 +1,17 @@
-# Use lightweight Java runtime image
+# Use lightweight Java runtime
 FROM eclipse-temurin:8-jre
 
-# Set working directory inside container
+# Set working directory
 WORKDIR /app
 
-# Copy Spring Boot jar into container
-COPY target/ecart-service-0.0.1-SNAPSHOT.jar app.jar
+# Copy the built JAR file
+COPY target/*.jar app.jar
 
-# Make Spring Boot listen on 9090
+# Default port (can be overridden at runtime)
 ENV SERVER_PORT=9090
 
-# Expose the correct port
+# Expose application port
 EXPOSE 9090
 
-# Start the application with correct port + health enabled
-ENTRYPOINT ["java","-jar","app.jar","--server.port=9090","--management.endpoints.web.exposure.include=*","--management.server.port=9090"]
+# Run the application
+ENTRYPOINT ["sh","-c","java -jar app.jar --server.port=${SERVER_PORT}"]
