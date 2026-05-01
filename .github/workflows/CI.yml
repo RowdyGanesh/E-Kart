@@ -36,12 +36,51 @@ jobs:
         docker build -t rowdygani/ecart-service:latest .
         docker build -t rowdygani/ecart-service:${{ github.sha }} .
 
-    # 🔐 Login to Docker Hub
+    # =========================
+    # 🔹 DOCKER HUB
+    # =========================
+
+    # Login to Docker Hub
     - name: Login to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    # 📤 Push Docker Images
-    - name: Push Docker Image
+    # Tag for Docker Hub
+    - name: Tag for Docker Hub
+      run: |
+        docker tag ecart-service:latest rowdygani/ecart-service:latest
+        docker tag ecart-service:${{ github.sha }} rowdygani/ecart-service:${{ github.sha }}
+
+    # Push to Docker Hub
+    - name: Push to Docker Hub
       run: |
         docker push rowdygani/ecart-service:latest
         docker push rowdygani/ecart-service:${{ github.sha }}
+
+    # =========================
+    # 🔹 AWS ECR
+    # =========================
+
+    # Configure AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    # Login to ECR
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # Tag for ECR
+    - name: Tag for ECR
+      run: |
+        docker tag ecart-service:latest ${{ steps.login-ecr.outputs.registry }}/rowdyops-ecart-service:latest
+        docker tag ecart-service:${{ github.sha }} ${{ steps.login-ecr.outputs.registry }}/rowdyops-ecart-service:${{ github.sha }}
+
+    # Push to ECR
+    - name: Push to ECR
+      run: |
+        docker push ${{ steps.login-ecr.outputs.registry }}/rowdyops-ecart-service:latest
+        docker push ${{ steps.login-ecr.outputs.registry }}/rowdyops-ecart-service:${{ github.sha }}
