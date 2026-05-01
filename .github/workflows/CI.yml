@@ -90,12 +90,8 @@ jobs:
 
     # Tag for ECR
     - name: Tag for ECR
-      run: |
-        docker tag ecart-service:latest ${{ steps.login-ecr.outputs.registry }}/rowdyops-ecart-service:latest
-        docker tag ecart-service:${{ github.sha }} ${{ steps.login-ecr.outputs.registry }}/rowdyops-ecart-service:${{ github.sha }}
+      run: docker tag ecart-service:${{ github.sha }} ${{ steps.login-ecr.outputs.registry }}/rowdyops-ecart-service:${{ github.sha }}
 
     # Push to ECR
     - name: Push to ECR
-      run: |
-        docker push ${{ steps.login-ecr.outputs.registry }}/rowdyops-ecart-service:latest
-        docker push ${{ steps.login-ecr.outputs.registry }}/rowdyops-ecart-service:${{ github.sha }}
+      run: docker push ${{ steps.login-ecr.outputs.registry }}/rowdyops-ecart-service:${{ github.sha }}
