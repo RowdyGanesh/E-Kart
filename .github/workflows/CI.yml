@@ -30,6 +30,13 @@ jobs:
     - name: Build with Maven
       run: mvn -B clean package -Dmaven.test.skip=true --file pom.xml
 
+    # Switch to Java 17 for Sonar
+    - name: Set up JDK 17 for Sonar
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
     # SonarQube Scan
     - name: SonarQube Scan
       run: |
