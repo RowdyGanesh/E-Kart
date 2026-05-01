@@ -33,8 +33,8 @@ jobs:
     # Build Docker Image
     - name: Build Docker Image
       run: |
-        docker build -t rowdygani/ecart-service:latest .
-        docker build -t rowdygani/ecart-service:${{ github.sha }} .
+        docker build -t ecart-service:latest .
+        docker build -t ecart-service:${{ github.sha }} .
 
     # =========================
     # 🔹 DOCKER HUB
