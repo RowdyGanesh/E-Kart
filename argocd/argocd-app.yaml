@@ -8,8 +8,8 @@ spec:
 
   source:
     repoURL: https://github.com/RowdyGanesh/E-Kart.git
-    targetRevision: main
-    path: k8s   # 👈 points to your manifests
+    targetRevision: GH-Actions   # ✅ fixed
+    path: k8s
 
   destination:
     server: https://kubernetes.default.svc
