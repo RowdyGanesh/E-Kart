@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ecart-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecart
+  template:
+    metadata:
+      labels:
+        app: ecart
+    spec:
+      containers:
+        - name: ecart
+          image: 246312965684.dkr.ecr.ap-south-1.amazonaws.com/rowdyops-ecart-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9090
