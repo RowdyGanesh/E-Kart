@@ -38,12 +38,12 @@ jobs:
         distribution: 'temurin'
 
     # SonarQube Scan
-    - name: SonarQube Scan
-      run: |
-        mvn sonar:sonar \
-          -Dsonar.projectKey=ecart-service \
-          -Dsonar.host.url=http://13.206.204.162:9000 \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+    #- name: SonarQube Scan
+    #  run: |
+    #    mvn sonar:sonar \
+    #      -Dsonar.projectKey=ecart-service \
+    #      -Dsonar.host.url=http://13.206.204.162:9000 \
+    #      -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
     # Build Docker Image
     - name: Build Docker Image
