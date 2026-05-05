@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ecart-app
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/RowdyGanesh/E-Kart.git
+    targetRevision: main
+    path: k8s   # 👈 points to your manifests
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
